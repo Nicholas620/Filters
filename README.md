@@ -12,16 +12,16 @@ Visualizations: Real-time graphs for filter characteristics and signal analysis.
 Intuitive Interface: A clean and easy-to-use interface built with PyQt.
 Cross-Platform: Compatible with Windows, macOS, and Linux.
 Extensibility: Easily extend the app with your own custom filter designs.
-🤖 Technology Stack
 
+🤖 Technology Stack
 Python 3.x
 PyQt5 for the GUI
 NumPy and SciPy for signal processing
 Matplotlib for plotting graphs
 Pandas for handling data (if needed)
 pytest for testing
-⚙️ How To Contribute
 
+⚙️ How To Contribute
 Fork the repository
 Clone your fork locally
 Create a new branch for your feature or bugfix
@@ -30,7 +30,6 @@ Push to your fork and submit a pull request
 We welcome all contributions, whether it's code, feedback, or documentation improvements. Let's make signal processing easier and more accessible for everyone!
 
 📜 License
-
 This project is licensed under the Educational Use License:
 
 Educational Purposes: You are free to use, modify, and share this project for non-commercial, educational purposes.
@@ -38,6 +37,5 @@ Commercial Use: If you'd like to use this project for commercial purposes, pleas
 For more details, please refer to the full LICENSE file.
 
 🤝 Contact Us
-
 Have any questions, ideas, or feedback? Feel free to open an issue or reach out to us directly!
 
