@@ -1,0 +1,155 @@
+Index: src/models/filters/non_recursive/base.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/models/filters/non_recursive/base.py b/src/models/filters/non_recursive/base.py
+--- a/src/models/filters/non_recursive/base.py	
++++ b/src/models/filters/non_recursive/base.py	(date 1734438951472)
+@@ -173,7 +173,7 @@
+ 
+         y = list()
+ 
+-        for k in range(L, len(x) - 2 * L + 1):
++        for k in range(0, signal.Nx):
+             sum_terms = 0.0
+ 
+             for i in range(L):
+@@ -187,5 +187,6 @@
+         T0 = signal.To
+         Nx = len(y)
+         filtered_signal = Signal(y, time_step=time_step, T0=T0, Nx=Nx)
++        print(filtered_signal.get_values())
+ 
+-        return filtered_signal
++        return filtered_signal
+\ No newline at end of file
+Index: src/models/signal.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/models/signal.py b/src/models/signal.py
+--- a/src/models/signal.py	
++++ b/src/models/signal.py	(date 1734386730868)
+@@ -1,34 +1,33 @@
+ import numpy as np
+-
++import matplotlib.pyplot as plt
++from typing import Optional, List
+ 
+ class Signal:
+-    def __init__(self, sin_coeffs=None, cos_coeffs=None):
+-        self.sin_coeffs = sin_coeffs if sin_coeffs is not None else list()
+-        self.cos_coeffs = cos_coeffs if cos_coeffs is not None else list()
+-
+-        self.F = list()
+-        self.time_step = None
+-        self.Nx = None
+-        self.To = None
+-
+-    def __init__(self, values=None, time_step=None, T0=None, Nx=None):
+-        """
+-        Конструктор для создания сигнала.
+-        - values: массив значений (F).
+-        - time_step: шаг дискретизации.
+-        - T0: конечное время интервала.
+-        - Nx: количество точек.
+-        """
+-        if values is None:
+-            self.sin_coeffs = []
+-            self.cos_coeffs = []
+-            self.F = []
++    def __init__(
++        self,
++        sin_coeffs: Optional[List[float]] = None,
++        cos_coeffs: Optional[List[float]] = None,
++        values: Optional[List[float]] = None,
++        time_step: Optional[float] = None,
++        T0: Optional[float] = None,
++        Nx: Optional[int] = None
++    ) -> None:
++        if sin_coeffs is not None or cos_coeffs is not None:
++            self.sin_coeffs: List[float] = sin_coeffs if sin_coeffs is not None else []
++            self.cos_coeffs: List[float] = cos_coeffs if cos_coeffs is not None else []
++            self.F: List[float] = []
++        elif values is not None:
++            self.F: List[float] = values
++            self.sin_coeffs: List[float] = []
++            self.cos_coeffs: List[float] = []
+         else:
+-            self.F = values
++            self.sin_coeffs: List[float] = []
++            self.cos_coeffs: List[float] = []
++            self.F: List[float] = []
+ 
+-        self.time_step = time_step
+-        self.Nx = Nx
+-        self.To = T0
++        self.time_step: Optional[float] = time_step
++        self.Nx: Optional[int] = Nx
++        self.To: Optional[float] = T0
+ 
+     def generate_points(self, time_step, T0):
+         """
+@@ -52,6 +51,26 @@
+ 
+             self.F.append(value)
+ 
++    def plot_signal(self):
++        """
++        Строит график значений сигнала во временной области.
++        """
++        if not self.F or self.time_step is None:
++            print("Сигнал не сгенерирован или отсутствует шаг дискретизации.")
++            return
++
++        time = np.linspace(0, self.To, len(self.F))
++
++        plt.figure(figsize=(10, 6))
++        plt.plot(time, self.F, label="Сигнал", color="b")
++        plt.title("График сигнала во временной области")
++        plt.xlabel("Время (t)")
++        plt.ylabel("Амплитуда")
++        plt.grid(True)
++        plt.legend()
++
++        return plt
++
+     def get_values(self):
+         """
+         Возвращает сгенерированные значения функции F.
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	
++++ b/main.py	(date 1734439685076)
+@@ -1,16 +1,16 @@
+ import matplotlib.pyplot as plt
++import numpy as np
+ from scipy.special import i0
+ from src.models.filters.non_recursive.HighBandFilter import HighBandFilter
+-
++from src.models.signal import Signal
+ # Создание фильтра и вычисление коэффициентов
+ filter = HighBandFilter(0.01, 0.01, 1.2, None, 3.0, 1, 0.05)
+ filter.calculate_coefficients()
+-# fig = filter.impulse_response()
+-# fig.show()
++filter.impulse_response().show()
+ 
++signal = Signal(sin_coeffs=[1, 3, 4, 5, 7, 9], cos_coeffs=[2, 4, 6])
++signal.generate_points(filter.time_step, 2 * np.pi)
++signal.plot_signal().show()
+ 
+-plot = filter.circuit_phase_response(0.1, 0, 10)
+-plot = filter.frequency_response(0.1, 0, 10)
+-plot = filter.impulse_response()
+-
+-plot.show()
+\ No newline at end of file
++filtered = filter.apply_filter(signal)
++filtered.plot_signal().show()
