@@ -1,2 +1,4 @@
 venv/
-README.md
+__pycache__/
+*.patch
+.idea/

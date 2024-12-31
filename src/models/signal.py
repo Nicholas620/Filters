@@ -30,6 +30,20 @@ class Signal:
         self.Nx: Optional[int] = Nx
         self.To: Optional[float] = T0
 
+    def apply_function(self, time: float) -> float:
+        """
+        Применяет тригонометрическую функцию, заданную в сигнале, ко времени t.
+        """
+        value = 0
+
+        for coeff in self.sin_coeffs:
+            value += np.sin(coeff * time)
+
+        for coeff in self.cos_coeffs:
+            value += np.cos(coeff * time)
+
+        return value
+
     def generate_points(self, time_step, T0):
         """
         Генерирует значения функции F(x) на интервале [0, T0] с шагом time_step.
@@ -42,15 +56,8 @@ class Signal:
 
         for i in range(self.Nx + 1):
             t = i * time_step
-            value = 0
 
-            for coeff in self.sin_coeffs:
-                value += np.sin(coeff * t)
-
-            for coeff in self.cos_coeffs:
-                value += np.cos(coeff * t)
-
-            self.F.append(value)
+            self.F.append(self.apply_function(t))
 
     def plot_signal(self):
         """
